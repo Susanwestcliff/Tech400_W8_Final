@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasty Recipe</title>
+    <style>
+        /* Center the content horizontally and vertically */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        /* Container to hold everything centrally */
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto; /* Make the container scrollable */
+        }
+
+        /* Style the form */
+        form {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        /* Style the result section */
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            max-height: 50vh; /* Limit height of the result section */
+            overflow-y: auto; /* Make the result section scrollable */
+        }
+
+        li {
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        p {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tasty Recipe</h1>
+        
+        <!-- Search form -->
+        <form method="POST" action="/">
+            <input type="text" name="query" placeholder="Enter your query" required>
+            <button type="submit">Search</button>
+        </form>
+
+        {% if query %}
+            <h2>Results for query: "{{ query }}"</h2>
+            <ul>
+                {% for doc_name, score in results %}
+                    <li><strong>{{ doc_name }}</strong>: {{ score }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No results found. Please try another search.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
