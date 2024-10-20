@@ -41,7 +41,7 @@ def calculate_frequencies(docs):
 
     return term_frequency, term_in_docs, total_docs
 
-# Compute BIM-based relevance scores with log probabilities
+# Compute BIM-based relevance scores with normalization and smoothing
 def get_relevance_score(query_terms, term_frequency, term_in_docs, total_docs):
     relevance_scores = {}
 
