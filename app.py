@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 import os
 import re
 from collections import defaultdict
+import math
 
 app = Flask(__name__)
 
@@ -40,24 +41,30 @@ def calculate_frequencies(docs):
 
     return term_frequency, term_in_docs, total_docs
 
-# Compute BIM-based relevance scores
+# Compute BIM-based relevance scores with log probabilities
 def get_relevance_score(query_terms, term_frequency, term_in_docs, total_docs):
     relevance_scores = {}
+
+    # Iterate through all documents
     for doc_name in term_frequency:
-        probability_score = 0.5
+        score = 0.5  # Start with a neutral score
+
+        # Calculate the relevance score for each term in the query
         for term in query_terms:
             term_freq = term_frequency[doc_name].get(term, 0)
             doc_freq = term_in_docs.get(term, 0)
 
-            # Adjust calculations to avoid divide by zero errors
-            if doc_freq == total_docs:
-                prob_non_relevant = 1e-10  # Small value to avoid division by zero
-            else:
-                prob_relevant = (term_freq + 1) / (sum(term_frequency[doc_name].values()) + len(term_in_docs))
-                prob_non_relevant = (doc_freq + 1) / (total_docs - doc_freq + len(term_in_docs))
+            # Smoothed probability of relevance (avoiding divide-by-zero)
+            prob_relevant = (term_freq + 1) / (sum(term_frequency[doc_name].values()) + len(term_in_docs))
+            prob_non_relevant = (doc_freq + 1) / (total_docs + len(term_in_docs))
 
-            probability_score *= (prob_relevant / prob_non_relevant)
-        relevance_scores[doc_name] = probability_score
+            # Ensure probabilities are in a reasonable range
+            prob_ratio = min(max(prob_relevant / prob_non_relevant, 0.1), 10)  # Clamp ratio between 0.1 and 10
+            score *= prob_ratio
+
+        # Normalize the score to prevent extreme values
+        relevance_scores[doc_name] = score / (1 + score)  # Converts to a bounded score (0 to 1)
+
     return relevance_scores
 
 # Core function to retrieve documents based on user input query
